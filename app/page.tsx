@@ -65,6 +65,101 @@ export default function Home() {
           </div>
         </section>
 
+        {/* New Premium Features Section */}
+        <section className="py-16 bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-950">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-4">Fonctionnalités Premium</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 text-center mb-12 max-w-3xl mx-auto">
+              Découvrez nos outils avancés pour optimiser votre présence en ligne
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="text-3xl mb-4">🎨</div>
+                <h3 className="text-xl font-semibold mb-2">Branding Complet</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Générez non seulement une bio, mais un ensemble complet avec nom d&apos;utilisateur, slogan et palette de couleurs.
+                </p>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/pricing">
+                      Voir les forfaits
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="text-3xl mb-4">📊</div>
+                <h3 className="text-xl font-semibold mb-2">Score et Optimisation</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Obtenez un score détaillé de votre bio et des conseils d&apos;optimisation en temps réel pour maximiser votre impact.
+                </p>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/pricing">
+                      Voir les forfaits
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="text-3xl mb-4">📝</div>
+                <h3 className="text-xl font-semibold mb-2">Idées de Posts</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Générez automatiquement des idées de contenu et des hashtags optimisés pour chaque plateforme.
+                </p>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/pricing">
+                      Voir les forfaits
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="text-3xl mb-4">📄</div>
+                <h3 className="text-xl font-semibold mb-2">Résumé Professionnel</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Créez un résumé professionnel pour LinkedIn ou un thread Twitter captivant basé sur votre profil.
+                </p>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/pricing">
+                      Voir les forfaits
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 md:col-span-2 lg:col-span-1">
+                <div className="text-3xl mb-4">🌐</div>
+                <h3 className="text-xl font-semibold mb-2">Mini-site Link-in-bio</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Créez automatiquement une page web personnalisée avec tous vos liens et votre branding - parfait pour Instagram et TikTok.
+                </p>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/pricing">
+                      Voir les forfaits
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-12 text-center">
+              <Button asChild className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                <Link href="/pricing">
+                  Voir tous les forfaits premium
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Generator Section */}
         <section id="generator" className="py-16 bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4">

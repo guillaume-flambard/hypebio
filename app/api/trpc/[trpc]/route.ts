@@ -1,14 +1,25 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { createTRPCContext } from '@/lib/trpc';
-import { appRouter } from '@/server/routers/_app';
-import { NextRequest } from 'next/server';
+import { appRouter, createTRPCContext } from '@/server/trpc';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 
-const handler = async (req: NextRequest) => {
+const handler = async (req: Request) => {
+  const session = await getServerSession(authOptions);
+  
   return fetchRequestHandler({
     endpoint: '/api/trpc',
     req,
     router: appRouter,
-    createContext: async () => createTRPCContext(),
+    createContext: async () => createTRPCContext({
+      headers: req.headers,
+      session,
+    }),
+    onError:
+      process.env.NODE_ENV === 'development'
+        ? ({ path, error }) => {
+            console.error(`❌ tRPC error on '${path}':`, error);
+          }
+        : undefined,
   });
 };
 

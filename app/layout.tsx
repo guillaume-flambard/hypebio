@@ -1,39 +1,26 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Providers from "@/providers/Providers";
 import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Providers } from "@/providers/Providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HypeBio - Générateur Automatique de Bios Virales",
-  description: "Générez des bios optimisées pour TikTok, Instagram, Twitter, LinkedIn et OnlyFans en quelques clics.",
-  keywords: "bio generator, bios virales, tiktok bio, instagram bio, twitter bio, linkedin bio, onlyfans bio",
+  title: "HypeBio - Générateur de bio IA pour réseaux sociaux",
+  description: "Créez la bio parfaite pour vos réseaux sociaux avec l'aide de l'intelligence artificielle",
   authors: [{ name: "HypeBio Team" }],
-  creator: "HypeBio",
+  keywords: "bio generator, instagram bio, twitter bio, linkedin bio, ia, ai, réseaux sociaux, social media",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="fr">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>
-          {children}
-        </Providers>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
