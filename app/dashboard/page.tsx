@@ -35,7 +35,8 @@ import {
   MoreHorizontalIcon,
   UserIcon,
   StarIcon,
-  SettingsIcon
+  SettingsIcon,
+  PlusIcon
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -194,175 +195,187 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-900">
       <Header />
-      <main className="flex-1 bg-slate-50 dark:bg-slate-900">
-        <section className="py-8 md:py-12 bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800">
+      <main className="flex-1">
+        <section className="py-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
           <div className="container px-4 mx-auto">
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start md:items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-14 w-14 border-2 border-white shadow-md">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16 border-4 border-white/20 shadow-xl">
                   <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || 'User'} />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white text-xl font-medium">
+                  <AvatarFallback className="bg-white/10 text-white text-xl font-medium">
                     {session?.user?.name 
                       ? session.user.name.split(' ').map(n => n[0]).join('').toUpperCase()
                       : session?.user?.email?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-1 text-white">
                     Bonjour, {session?.user?.name || session?.user?.email?.split('@')[0] || 'Utilisateur'}
                   </h1>
-                  <p className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                    <Badge variant={session?.user?.isPremium ? "default" : "outline"} className={session?.user?.isPremium ? "bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600" : ""}>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={session?.user?.isPremium ? "default" : "outline"} 
+                      className={session?.user?.isPremium 
+                        ? "bg-amber-400 text-amber-950 hover:bg-amber-300 border-0" 
+                        : "bg-white/10 hover:bg-white/20 border-0"}>
                       {session?.user?.isPremium ? 'Premium' : 'Gratuit'}
                     </Badge>
-                    <span className="ml-2">{session?.user?.email}</span>
-                  </p>
+                    <span className="text-white/80 text-sm">{session?.user?.email}</span>
+                  </div>
                 </div>
               </div>
               
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    Mon compte <ChevronRightIcon className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer flex items-center">
-                      <UserIcon className="mr-2 h-4 w-4" />
-                      <span>Mon profil</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer flex items-center">
-                      <SettingsIcon className="mr-2 h-4 w-4" />
-                      <span>Paramètres</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  {!session?.user?.isPremium && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/pricing" className="cursor-pointer flex items-center text-amber-500">
-                          <StarIcon className="mr-2 h-4 w-4" />
-                          <span>Passer à Premium</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex gap-3">
+                <Button size="sm" variant="secondary" className="bg-white/10 hover:bg-white/20 border-0 text-white" asChild>
+                  <Link href="/#generator">
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    Nouvelle bio
+                  </Link>
+                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="secondary" className="bg-white/10 hover:bg-white/20 border-0 text-white">
+                      Mon compte <ChevronRightIcon className="h-3 w-3 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer flex items-center">
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        <span>Mon profil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="cursor-pointer flex items-center">
+                        <SettingsIcon className="mr-2 h-4 w-4" />
+                        <span>Paramètres</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    {!session?.user?.isPremium && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href="/pricing" className="cursor-pointer flex items-center text-amber-500">
+                            <StarIcon className="mr-2 h-4 w-4" />
+                            <span>Passer à Premium</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="mb-6 justify-start bg-slate-100 dark:bg-slate-800/50 p-1">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="history">Historique</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="dashboard" className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800/60">
-                      <CardTitle>Vue d'ensemble</CardTitle>
-                      <CardDescription>Activité sur votre compte</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-5">
-                      <div className="flex items-center justify-between border-b pb-3 mb-3 border-slate-100 dark:border-slate-700">
-                        <span className="text-slate-600 dark:text-slate-400">Bios générées</span>
-                        <span className="font-semibold text-lg">{totalBios}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-600 dark:text-slate-400">Plateforme favorite</span>
-                        <Badge variant="outline" className="capitalize">{favoritePlatform}</Badge>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="pt-0 flex items-center justify-between">
-                      <Button variant="link" size="sm" className="px-0" asChild>
-                        <Link href="#history">
-                          Voir l'historique
-                        </Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
+        <section className="py-8 container mx-auto px-4">
+          <Tabs defaultValue="dashboard" className="w-full">
+            <TabsList className="mb-6 bg-white dark:bg-slate-800 shadow-sm rounded-lg p-1">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="history">Historique</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dashboard" className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow duration-200 bg-white dark:bg-slate-800">
+                  <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <CardTitle>Vue d'ensemble</CardTitle>
+                    <CardDescription>Activité sur votre compte</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-5">
+                    <div className="flex items-center justify-between border-b pb-3 mb-3 border-slate-100 dark:border-slate-700">
+                      <span className="text-slate-600 dark:text-slate-400">Bios générées</span>
+                      <span className="font-semibold text-lg">{totalBios}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Plateforme favorite</span>
+                      <Badge variant="secondary" className="capitalize">{favoritePlatform}</Badge>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-0 flex items-center justify-between">
+                    <Button variant="ghost" size="sm" className="px-0 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300" asChild>
+                      <Link href="#history">
+                        Voir l'historique
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
 
-                  <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/60">
-                      <CardTitle>Statistiques</CardTitle>
-                      <CardDescription>Répartition par plateforme</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-5">
-                      {Object.keys(platformCounts).length > 0 ? (
-                        <div className="space-y-3">
-                          {Object.entries(platformCounts).map(([platform, count]) => (
-                            <div key={platform} className="flex items-center justify-between">
-                              <span className="capitalize text-slate-600 dark:text-slate-400">{platform}</span>
-                              <div className="flex items-center gap-2">
-                                <Progress 
-                                  value={Math.min(100, (typeof count === 'number' ? count : 0) / totalBios * 100)} 
-                                  className="h-2 w-28"
-                                />
-                                <span className="text-sm font-medium w-5 text-right">{typeof count === 'number' ? count : '0'}</span>
-                              </div>
+                <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow duration-200 bg-white dark:bg-slate-800">
+                  <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <CardTitle>Statistiques</CardTitle>
+                    <CardDescription>Répartition par plateforme</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-5">
+                    {Object.keys(platformCounts).length > 0 ? (
+                      <div className="space-y-3">
+                        {Object.entries(platformCounts).map(([platform, count]) => (
+                          <div key={platform} className="flex items-center justify-between">
+                            <span className="capitalize text-slate-600 dark:text-slate-400">{platform}</span>
+                            <div className="flex items-center gap-2">
+                              <Progress 
+                                value={Math.min(100, (typeof count === 'number' ? count : 0) / totalBios * 100)} 
+                                className="h-2 w-28 bg-slate-200 dark:bg-slate-700"
+                              />
+                              <span className="text-sm font-medium w-5 text-right">{typeof count === 'number' ? count : '0'}</span>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-6 text-slate-500 dark:text-slate-400">
-                          Aucune donnée disponible
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-800/60">
-                      <CardTitle>Votre plan</CardTitle>
-                      <CardDescription>Fonctionnalités disponibles</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-5">
-                      <div className="text-center py-2">
-                        <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 mb-3">
-                          <span className={`text-xl ${session?.user?.isPremium ? 'text-yellow-500' : 'text-slate-500'}`}>
-                            {session?.user?.isPremium ? '★' : '☆'}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-semibold mb-1">
-                          Plan {session?.user?.isPremium ? 'Premium' : 'Gratuit'}
-                        </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                          {session?.user?.isPremium 
-                            ? 'Accès à toutes les fonctionnalités premium'
-                            : 'Fonctionnalités limitées'}
-                        </p>
+                          </div>
+                        ))}
                       </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button 
-                        asChild 
-                        className={`w-full ${session?.user?.isPremium 
-                          ? 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600' 
-                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'}`}
-                        disabled={session?.user?.isPremium}
-                      >
-                        <Link href="/pricing">
-                          {session?.user?.isPremium ? 'Déjà Premium' : 'Passer à Premium'}
-                        </Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="history" className="space-y-6" id="history">
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                        Aucune donnée disponible
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow duration-200 bg-white dark:bg-slate-800">
+                  <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <CardTitle>Votre plan</CardTitle>
+                    <CardDescription>Fonctionnalités disponibles</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-5">
+                    <div className="text-center py-2">
+                      <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-indigo-50 dark:bg-indigo-900/20 mb-3">
+                        <span className={`text-2xl ${session?.user?.isPremium ? 'text-amber-400' : 'text-slate-400'}`}>
+                          {session?.user?.isPremium ? '★' : '☆'}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold mb-1">
+                        Plan {session?.user?.isPremium ? 'Premium' : 'Gratuit'}
+                      </h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {session?.user?.isPremium 
+                          ? 'Accès à toutes les fonctionnalités premium'
+                          : 'Fonctionnalités limitées'}
+                      </p>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      asChild 
+                      className={`w-full ${session?.user?.isPremium 
+                        ? 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600' 
+                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'}`}
+                      disabled={session?.user?.isPremium}
+                    >
+                      <Link href="/pricing">
+                        {session?.user?.isPremium ? 'Déjà Premium' : 'Passer à Premium'}
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="history" className="space-y-6" id="history">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Historique de vos bios</h2>
                   
@@ -379,7 +392,7 @@ export default function DashboardPage() {
                                 placeholder="Rechercher..." 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 w-full"
+                                className="pl-9 w-full bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
                               />
                               {searchTerm && (
                                 <button 
@@ -409,11 +422,11 @@ export default function DashboardPage() {
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {bios.map((bio: Bio) => (
-                        <Card key={bio.id} className="group border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all duration-200">
-                          <CardHeader className="pb-2 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800/60">
+                        <Card key={bio.id} className="group border-0 shadow-md hover:shadow-xl transition-all duration-200 bg-white dark:bg-slate-800 overflow-hidden">
+                          <CardHeader className="pb-2 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex justify-between items-start">
                               <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="capitalize">
+                                <Badge variant="outline" className="capitalize bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800">
                                   {bio.platform}
                                 </Badge>
                                 <Badge variant="secondary" className="capitalize">
@@ -464,7 +477,7 @@ export default function DashboardPage() {
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="pt-4">
-                            <div className="bg-white/50 dark:bg-slate-950/50 p-4 rounded-md border border-slate-100 dark:border-slate-800">
+                            <div className="bg-slate-50 dark:bg-slate-700/30 p-4 rounded-md border border-slate-100 dark:border-slate-700">
                               {bio.content}
                             </div>
                           </CardContent>
@@ -476,7 +489,7 @@ export default function DashboardPage() {
                                     variant="outline" 
                                     size="sm" 
                                     onClick={() => copyToClipboard(bio.content)}
-                                    className="gap-1"
+                                    className="gap-1 bg-transparent"
                                   >
                                     <ClipboardCopyIcon className="h-3.5 w-3.5" />
                                     Copier
@@ -495,7 +508,7 @@ export default function DashboardPage() {
                                     variant="outline" 
                                     size="sm"
                                     onClick={() => toast.info("Fonctionnalité bientôt disponible")}
-                                    className="gap-1"
+                                    className="gap-1 bg-transparent"
                                   >
                                     <RefreshCcwIcon className="h-3.5 w-3.5" />
                                     Régénérer
@@ -560,8 +573,8 @@ export default function DashboardPage() {
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-16 border border-dashed border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50/50 dark:bg-slate-800/20">
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                  <div className="text-center py-16 border border-dashed border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/20">
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 dark:bg-indigo-900/20 mb-4">
                       <span className="text-2xl">📝</span>
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 mb-4">
@@ -570,7 +583,7 @@ export default function DashboardPage() {
                         : "Vous n'avez pas encore généré de bios."}
                     </p>
                     {!searchTerm && (
-                      <Button asChild className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
+                      <Button asChild className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                         <Link href="/#generator">
                           Générer ma première bio
                         </Link>
@@ -578,9 +591,9 @@ export default function DashboardPage() {
                     )}
                   </div>
                 )}
-              </TabsContent>
-            </Tabs>
-          </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </section>
       </main>
       <Footer />
