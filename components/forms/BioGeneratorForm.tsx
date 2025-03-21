@@ -505,14 +505,79 @@ export default function BioGeneratorForm() {
                   </div>
                 )}
               </div>
+
+              {/* Section d'analyse globale */}
+              {scoreDetails && (
+                <Card className="border-0 shadow-sm bg-white dark:bg-gray-800 mb-6">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row gap-6 items-start">
+                      <div className="flex flex-col items-center">
+                        <div className={`text-5xl font-bold mb-2 ${scoreDetails.readability >= 80 ? 'text-green-500' : scoreDetails.readability >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                          {bioScore}/100
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Score global
+                        </p>
+                      </div>
+                      
+                      <div className="flex-1 space-y-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Lisibilité</span>
+                            <div className="flex items-center">
+                              <span className={`font-medium mr-2 ${scoreDetails.readability >= 80 ? 'text-green-500' : scoreDetails.readability >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {scoreDetails.readability}
+                              </span>
+                              <Progress value={scoreDetails.readability} className="h-2 w-full" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Engagement</span>
+                            <div className="flex items-center">
+                              <span className={`font-medium mr-2 ${scoreDetails.engagement >= 80 ? 'text-green-500' : scoreDetails.engagement >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {scoreDetails.engagement}
+                              </span>
+                              <Progress value={scoreDetails.engagement} className="h-2 w-full" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Unicité</span>
+                            <div className="flex items-center">
+                              <span className={`font-medium mr-2 ${scoreDetails.uniqueness >= 80 ? 'text-green-500' : scoreDetails.uniqueness >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {scoreDetails.uniqueness}
+                              </span>
+                              <Progress value={scoreDetails.uniqueness} className="h-2 w-full" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Pertinence</span>
+                            <div className="flex items-center">
+                              <span className={`font-medium mr-2 ${scoreDetails.platformRelevance >= 80 ? 'text-green-500' : scoreDetails.platformRelevance >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {scoreDetails.platformRelevance}
+                              </span>
+                              <Progress value={scoreDetails.platformRelevance} className="h-2 w-full" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {scoreDetails.analysis && (
+                          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-md border border-gray-200 dark:border-gray-700">
+                            <h4 className="font-medium mb-2 text-indigo-600 dark:text-indigo-400">Analyse et conseils</h4>
+                            <p className="text-gray-700 dark:text-gray-300 text-sm">{scoreDetails.analysis}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 mb-6">
+                <TabsList className="w-full grid grid-cols-2 md:grid-cols-5 mb-6">
                   <TabsTrigger value="bio">Bio</TabsTrigger>
                   <TabsTrigger value="branding" disabled={!branding}>Branding</TabsTrigger>
                   <TabsTrigger value="postIdeas" disabled={!postIdeas}>Posts</TabsTrigger>
                   <TabsTrigger value="resume" disabled={!resume}>CV</TabsTrigger>
-                  <TabsTrigger value="score" disabled={!scoreDetails}>Analyse</TabsTrigger>
                   <TabsTrigger value="linkInBio" disabled={!linkInBio}>Link in Bio</TabsTrigger>
                 </TabsList>
                 
@@ -682,46 +747,6 @@ export default function BioGeneratorForm() {
                           className="mt-4 border-gray-200 dark:border-gray-700"
                           onClick={() => {
                             form.setValue("options.generateResume", true);
-                            setActiveTab("bio");
-                          }}
-                        >
-                          Activer maintenant
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="score" className="mt-0">
-                  {scoreDetails ? (
-                    <Card className="border-0 shadow-sm bg-white dark:bg-gray-800">
-                      <CardContent className="p-6">
-                        <div className="mb-6 flex flex-col items-center">
-                          <div className={`text-5xl font-bold mb-2 ${scoreDetails.readability >= 80 ? 'text-green-500' : scoreDetails.readability >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
-                            {scoreDetails.readability}/100
-                          </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Score de lisibilité de votre bio
-                          </p>
-                        </div>
-                        <div className="mb-4 whitespace-pre-wrap rounded-md font-medium text-gray-700 dark:text-gray-300">
-                          <ScrollArea className="h-[250px] pr-4">
-                            {scoreDetails.analysis}
-                          </ScrollArea>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <Card className="border-0 shadow-sm bg-white dark:bg-gray-800">
-                      <CardContent className="p-6 flex flex-col items-center justify-center min-h-[200px]">
-                        <p className="text-gray-500 dark:text-gray-400 text-center">
-                          Activez l&apos;option Optimisation temps réel dans les fonctionnalités premium pour générer ces informations.
-                        </p>
-                        <Button 
-                          variant="outline" 
-                          className="mt-4 border-gray-200 dark:border-gray-700"
-                          onClick={() => {
-                            form.setValue("options.optimizeInRealTime", true);
                             setActiveTab("bio");
                           }}
                         >

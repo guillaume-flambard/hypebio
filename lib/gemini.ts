@@ -113,6 +113,30 @@ function buildPrompt(options: GenerateOptions): string {
   if (isPremium) {
     prompt += `\nEn tant qu'utilisateur premium, ajoute également :\n`;
     
+    // Si la fonctionnalité d'optimisation en temps réel est activée, on met à jour le schéma des scoreDetails
+    if (premiumOptions.optimizeInRealTime) {
+      // Récupérons toutes les options sélectionnées pour les mentionner dans l'analyse
+      const selectedOptions = [];
+      if (premiumOptions.generateBranding) selectedOptions.push("branding");
+      if (premiumOptions.generatePostIdeas) selectedOptions.push("idées de posts");
+      if (premiumOptions.generateResume) selectedOptions.push("CV");
+      if (premiumOptions.generateLinkInBio) selectedOptions.push("link-in-bio");
+      
+      const optionsText = selectedOptions.length > 0 
+        ? `et prenant en compte les autres éléments générés (${selectedOptions.join(', ')})` 
+        : "";
+      
+      prompt += `
+      "scoreDetails": {
+        "readability": 80, // Entre 0 et 100
+        "engagement": 85, // Entre 0 et 100
+        "uniqueness": 75, // Entre 0 et 100
+        "platformRelevance": 90, // Entre 0 et 100
+        "analysis": "Une analyse détaillée (300-500 caractères) des points forts et faibles de la bio, avec des conseils spécifiques pour améliorer chaque aspect: lisibilité, engagement, unicité et pertinence pour la plateforme ${platform} ${optionsText}."
+      },
+      `;
+    }
+    
     if (premiumOptions.generateBranding) {
       prompt += `
       "branding": {
@@ -140,18 +164,6 @@ function buildPrompt(options: GenerateOptions): string {
     if (premiumOptions.generateResume) {
       prompt += `
       "resume": "Un résumé professionnel pour ${name} basé sur ${interests} et adapté pour ${platform}",
-      `;
-    }
-    
-    if (premiumOptions.optimizeInRealTime) {
-      prompt += `
-      "scoreDetails": {
-        "readability": 80, // Entre 0 et 100
-        "engagement": 85, // Entre 0 et 100
-        "uniqueness": 75, // Entre 0 et 100
-        "platformRelevance": 90, // Entre 0 et 100
-        "analysis": "Une analyse détaillée (300-500 caractères) des points forts et faibles de la bio, avec des conseils spécifiques pour améliorer chaque aspect: lisibilité, engagement, unicité et pertinence pour la plateforme ${platform}."
-      },
       `;
     }
     
