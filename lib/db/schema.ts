@@ -11,6 +11,16 @@ export const users = sqliteTable('user', {
   isPremium: integer('isPremium', { mode: 'boolean' }).default(false),
 });
 
+// Table pour les authentifications par mot de passe
+export const userCredentials = sqliteTable('userCredential', {
+  id: text('id').notNull().primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  password: text('password').notNull(),
+  createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(strftime('%s', 'now') * 1000)`),
+});
+
 // Table des comptes (pour l'authentification sociale)
 export const accounts = sqliteTable(
   'account',

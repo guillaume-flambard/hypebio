@@ -5,7 +5,8 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "./lib/db";
 import { eq } from "drizzle-orm";
-import { users } from "./lib/db/schema";
+import { users, userCredentials } from "./lib/db/schema";
+import { compare } from "bcrypt";
 
 // Étendre les types de NextAuth
 declare module "next-auth" {
@@ -53,9 +54,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Cette partie nécessite une implémentation supplémentaire pour vérifier les identifiants
-        // Utilisation d'un exemple simplifié pour l'instant
-        // Dans un environnement de production, les mots de passe devraient être hachés
+        // Get user by email
         const userResult = await db.select().from(users).where(eq(users.email, credentials.email)).limit(1);
         const user = userResult[0];
 
@@ -63,10 +62,14 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // La partie ci-dessous nécessiterait une table d'authentification supplémentaire avec des mots de passe hachés
-        // Ci-dessous une implémentation fictive
-        // const isPasswordValid = await compare(credentials.password, user.hashedPassword);
-        // if (!isPasswordValid) return null;
+        // Get user credentials
+        const userCredentialResult = await db.select().from(userCredentials).where(eq(userCredentials.userId, user.id)).limit(1);
+        const userCred = userCredentialResult[0];
+
+        // If no credential found or password doesn't match
+        if (!userCred || !(await compare(credentials.password, userCred.password))) {
+          return null;
+        }
 
         return {
           id: user.id,
