@@ -32,40 +32,43 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* Features Section - Expanded with more benefits */}
         <section className="py-16 bg-white dark:bg-gray-950">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Pourquoi choisir HypeBio ?</h2>
+            <h2 className="text-3xl font-bold text-center mb-6">Pourquoi choisir HypeBio ?</h2>
+            <p className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+              Notre technologie d&apos;IA avancée crée des bios captivantes qui génèrent plus d&apos;engagement
+            </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-3xl mb-4">⚡️</div>
                 <h3 className="text-xl font-semibold mb-2">Rapide et Efficace</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Générez une bio optimisée en quelques secondes, sans effort.
+                  Générez une bio optimisée en quelques secondes, sans effort et adaptée à votre style.
                 </p>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-3xl mb-4">🎯</div>
                 <h3 className="text-xl font-semibold mb-2">Optimisé par Plateforme</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Chaque bio est adaptée spécifiquement à la plateforme choisie.
+                  Chaque bio est spécifiquement adaptée aux exigences et au format de la plateforme choisie.
                 </p>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-3xl mb-4">🔥</div>
                 <h3 className="text-xl font-semibold mb-2">Style Personnalisé</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Choisissez parmi différents styles pour correspondre à votre personnalité.
+                  Choisissez parmi différents styles pour correspondre à votre personnalité et votre audience.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* New Premium Features Section */}
+        {/* Premium Features Section - Condensed */}
         <section className="py-16 bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-950">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-4">Fonctionnalités Premium</h2>
@@ -73,12 +76,14 @@ export default function Home() {
               Découvrez nos outils avancés pour optimiser votre présence en ligne
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl mb-4">🎨</div>
-                <h3 className="text-xl font-semibold mb-2">Branding Complet</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="text-3xl mr-4">🎨</div>
+                  <h3 className="text-xl font-semibold">Branding Complet</h3>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Générez non seulement une bio, mais un ensemble complet avec nom d&apos;utilisateur, slogan et palette de couleurs.
+                  Générez un ensemble complet avec bio, nom d&apos;utilisateur, slogan et palette de couleurs. Créez une identité visuelle cohérente sur tous vos réseaux.
                 </p>
                 <div className="flex justify-end">
                   <Button asChild variant="outline" size="sm">
@@ -89,11 +94,13 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl mb-4">📊</div>
-                <h3 className="text-xl font-semibold mb-2">Score et Optimisation</h3>
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="text-3xl mr-4">📊</div>
+                  <h3 className="text-xl font-semibold">Score et Optimisation</h3>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Obtenez un score détaillé de votre bio et des conseils d&apos;optimisation en temps réel pour maximiser votre impact.
+                  Obtenez un score détaillé de votre bio avec conseils d&apos;optimisation en temps réel. Analysez la lisibilité, l&apos;engagement et la pertinence pour maximiser votre impact.
                 </p>
                 <div className="flex justify-end">
                   <Button asChild variant="outline" size="sm">
@@ -104,11 +111,13 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl mb-4">📝</div>
-                <h3 className="text-xl font-semibold mb-2">Idées de Posts</h3>
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="text-3xl mr-4">📝</div>
+                  <h3 className="text-xl font-semibold">Contenu et Stratégie</h3>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Générez automatiquement des idées de contenu et des hashtags optimisés pour chaque plateforme.
+                  Générez automatiquement des idées de posts, des hashtags optimisés et construisez une stratégie cohérente pour augmenter votre visibilité et votre engagement.
                 </p>
                 <div className="flex justify-end">
                   <Button asChild variant="outline" size="sm">
@@ -119,26 +128,13 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="text-3xl mb-4">📄</div>
-                <h3 className="text-xl font-semibold mb-2">Résumé Professionnel</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Créez un résumé professionnel pour LinkedIn ou un thread Twitter captivant basé sur votre profil.
-                </p>
-                <div className="flex justify-end">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/pricing">
-                      Voir les forfaits
-                    </Link>
-                  </Button>
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="text-3xl mr-4">🌐</div>
+                  <h3 className="text-xl font-semibold">Solutions Avancées</h3>
                 </div>
-              </div>
-              
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 md:col-span-2 lg:col-span-1">
-                <div className="text-3xl mb-4">🌐</div>
-                <h3 className="text-xl font-semibold mb-2">Mini-site Link-in-bio</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Créez automatiquement une page web personnalisée avec tous vos liens et votre branding - parfait pour Instagram et TikTok.
+                  Accédez à des fonctionnalités premium comme le résumé professionnel pour LinkedIn, le mini-site Link-in-bio pour Instagram et TikTok, et plus encore.
                 </p>
                 <div className="flex justify-end">
                   <Button asChild variant="outline" size="sm">
@@ -177,8 +173,8 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">Ce que disent nos utilisateurs</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center mr-3">
                     <span className="font-semibold text-purple-700">S</span>
@@ -193,7 +189,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center mr-3">
                     <span className="font-semibold text-blue-700">T</span>
@@ -208,7 +204,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center mr-3">
                     <span className="font-semibold text-green-700">L</span>

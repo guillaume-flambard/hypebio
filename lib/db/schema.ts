@@ -63,5 +63,7 @@ export const generatedBios = sqliteTable('generatedBio', {
   platform: text('platform').notNull(),
   style: text('style').notNull(),
   content: text('content').notNull(),
+  interests: text('interests').notNull(),
+  score: integer('score').default(0),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull().default(sql`(strftime('%s', 'now') * 1000)`),
 }); 

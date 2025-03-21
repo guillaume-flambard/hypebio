@@ -5,6 +5,8 @@ import { generatedBios } from "@/lib/db/schema";
 import { eq, desc, and, like, count, SQL } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { v4 as uuidv4 } from 'uuid';
+import { generateBio, type BioResponse, type GenerateOptions } from '@/lib/gemini';
+import { nanoid } from 'nanoid';
 
 // Types spécifiques pour le routeur
 type PlatformStat = {
@@ -12,149 +14,59 @@ type PlatformStat = {
   count: number;
 };
 
+// Schéma de validation pour la génération de bio
+const generateInputSchema = z.object({
+  name: z.string().min(1, { message: 'Le nom est requis' }),
+  platform: z.enum(['tiktok', 'instagram', 'twitter', 'linkedin', 'onlyfans']),
+  style: z.enum(['fun', 'professional', 'gaming', 'sexy', 'mysterious', 'creative']),
+  interests: z.string().min(1, { message: 'Les intérêts sont requis' }),
+  isPremium: z.boolean().default(false),
+  options: z.object({
+    generateBranding: z.boolean().default(false),
+    generatePostIdeas: z.boolean().default(false),
+    generateResume: z.boolean().default(false),
+    optimizeInRealTime: z.boolean().default(false),
+    generateLinkInBio: z.boolean().default(false),
+  }).default({
+    generateBranding: false,
+    generatePostIdeas: false,
+    generateResume: false,
+    optimizeInRealTime: false,
+    generateLinkInBio: false,
+  }),
+});
+
+export type GenerateInput = z.infer<typeof generateInputSchema>;
+
 export const bioRouter = router({
-  // Générer une bio
+  // Route publique pour générer une bio sans inscription
   generate: publicProcedure
-    .input(z.object({
-      name: z.string().min(1),
-      platform: z.string().min(1),
-      style: z.string().min(1),
-      interests: z.string().min(1),
-      isPremium: z.boolean().default(false),
-      options: z.object({
-        generateBranding: z.boolean().default(false),
-        generatePostIdeas: z.boolean().default(false),
-        generateResume: z.boolean().default(false),
-        optimizeInRealTime: z.boolean().default(false),
-        generateLinkInBio: z.boolean().default(false),
-      }).optional(),
-    }))
-    .mutation(async ({ input, ctx }) => {
+    .input(generateInputSchema)
+    .mutation(async ({ input }) => {
       try {
-        // Exemple de génération
-        let bioContent = `Je suis ${input.name}. `;
-        
-        if (input.platform === 'instagram') {
-          bioContent += "📸 Créateur de contenu visuel. ";
-        } else if (input.platform === 'tiktok') {
-          bioContent += "🎵 Créateur de tendances. ";
-        } else if (input.platform === 'linkedin') {
-          bioContent += "💼 Professionnel passionné. ";
-        } else if (input.platform === 'twitter') {
-          bioContent += "💬 Partageur d'idées. ";
-        }
-        
-        if (input.style === 'fun') {
-          bioContent += "Toujours prêt à faire sourire! 😄";
-        } else if (input.style === 'professional') {
-          bioContent += "Expert dans mon domaine, à votre service.";
-        } else if (input.style === 'creative') {
-          bioContent += "Créatif et innovant dans tout ce que je fais! ✨";
-        } else if (input.style === 'minimal') {
-          bioContent += "Simplicité. Efficacité.";
-        }
-        
-        // Ajoutez les intérêts
-        if (input.interests) {
-          const interestsList = input.interests.split(',').map((i: string) => i.trim());
-          if (interestsList.length > 0) {
-            bioContent += " Passionné de " + interestsList.slice(0, 3).join(', ') + ".";
-          }
-        }
+        console.log("Génération de bio avec entrées:", {
+          name: input.name,
+          platform: input.platform,
+          style: input.style,
+          interestsLength: input.interests.length
+        });
 
-        // Si l'utilisateur est connecté, sauvegarder la bio générée
-        if (ctx.session?.user?.id) {
-          // Générer un ID unique pour la bio
-          const bioId = uuidv4();
-          const now = new Date();
-          
-          // S'assurer que tous les champs requis sont présents
-          await db.insert(generatedBios).values({
-            id: bioId,
-            platform: input.platform,
-            style: input.style,
-            content: bioContent,
-            userId: ctx.session.user.id,
-            createdAt: now,
-          });
-        }
-
-        // Pour les utilisateurs premium, générer les fonctionnalités supplémentaires
-        if (input.isPremium && input.options) {
-          const response: {
-            success: boolean;
-            bio: string;
-            score?: number;
-            scoreDetails?: {
-              readability: number;
-              engagement: number;
-              uniqueness: number;
-              platformRelevance: number;
-            };
-            branding?: {
-              username: string;
-              slogan: string;
-              colors: string[];
-            };
-            postIdeas?: string[];
-            hashtags?: string[];
-            resume?: string;
-          } = {
-            success: true,
-            bio: bioContent,
-          };
-
-          if (input.options.optimizeInRealTime) {
-            response.score = Math.floor(Math.random() * 30) + 70; // Score entre 70 et 100
-            response.scoreDetails = {
-              readability: Math.floor(Math.random() * 30) + 70,
-              engagement: Math.floor(Math.random() * 30) + 70,
-              uniqueness: Math.floor(Math.random() * 30) + 70,
-              platformRelevance: Math.floor(Math.random() * 30) + 70,
-            };
-          }
-
-          if (input.options.generateBranding) {
-            response.branding = {
-              username: `${input.name.toLowerCase().replace(/\s+/g, '')}${Math.floor(Math.random() * 1000)}`,
-              slogan: `${input.style === 'fun' ? 'Amusez-vous avec moi!' : input.style === 'professional' ? 'Excellence et expertise.' : input.style === 'creative' ? 'Créativité sans limites.' : 'Simplement efficace.'}`,
-              colors: [
-                '#' + Math.floor(Math.random()*16777215).toString(16),
-                '#' + Math.floor(Math.random()*16777215).toString(16),
-                '#' + Math.floor(Math.random()*16777215).toString(16),
-              ],
-            };
-          }
-
-          if (input.options.generatePostIdeas) {
-            response.postIdeas = [
-              `Comment j'ai découvert ma passion pour ${input.interests.split(',')[0]}`,
-              `3 astuces pour progresser en ${input.interests.split(',')[0]}`,
-              `Ma routine quotidienne de ${input.style === 'professional' ? 'productivité' : input.style === 'creative' ? 'créativité' : 'motivation'}`,
-            ];
-            
-            response.hashtags = [
-              `#${input.platform}Creator`,
-              `#${input.interests.split(',')[0].replace(/\s+/g, '')}`,
-              `#${input.style}Content`,
-              `#${input.name.replace(/\s+/g, '')}`,
-              `#Create${input.platform.charAt(0).toUpperCase() + input.platform.slice(1)}`,
-            ];
-          }
-
-          if (input.options.generateResume) {
-            response.resume = `${input.name} | ${input.style === 'professional' ? 'Expert' : input.style === 'creative' ? 'Créateur' : 'Influenceur'} ${input.platform.charAt(0).toUpperCase() + input.platform.slice(1)}\n\nSpécialisé en ${input.interests.split(',').join(', ')}. ${input.style === 'fun' ? 'Apporte joie et divertissement' : input.style === 'professional' ? 'Offre expertise et conseils professionnels' : input.style === 'creative' ? 'Crée du contenu innovant et inspirant' : 'Propose du contenu direct et efficace'} à une communauté engagée.`;
-          }
-
-          return response;
-        }
-
-        return {
-          success: true,
-          bio: bioContent,
+        // Convertir l'input pour s'assurer que tous les champs requis sont présents
+        const geminiInput: GenerateOptions = {
+          name: input.name,
+          platform: input.platform,
+          style: input.style,
+          interests: input.interests,
+          isPremium: input.isPremium,
+          options: input.options
         };
+
+        // Utiliser l'API Gemini pour générer une bio
+        const result = await generateBio(geminiInput);
+        
+        return result;
       } catch (error) {
-        console.error("Erreur lors de la génération:", error);
+        console.error("Erreur lors de la génération de bio:", error);
         return {
           success: false,
           error: "Une erreur est survenue lors de la génération de la bio."
@@ -326,6 +238,73 @@ export const bioRouter = router({
         return {
           success: false,
           error: "Une erreur est survenue lors de la récupération de vos statistiques."
+        };
+      }
+    }),
+
+  // Route privée pour récupérer l'historique des bios d'un utilisateur
+  getUserBios: privateProcedure
+    .query(async ({ ctx }) => {
+      try {
+        const userId = ctx.session.user.id;
+        
+        // Récupérer les bios sauvegardées de l'utilisateur depuis la base de données
+        const userBios = await db
+          .select()
+          .from(generatedBios)
+          .where(eq(generatedBios.userId, userId));
+        
+        return {
+          success: true,
+          bios: userBios
+        };
+      } catch (error) {
+        console.error("Erreur lors de la récupération des bios:", error);
+        return {
+          success: false,
+          error: "Une erreur est survenue lors de la récupération de vos bios."
+        };
+      }
+    }),
+  
+  // Route privée pour sauvegarder une bio générée
+  saveBio: privateProcedure
+    .input(z.object({
+      bio: z.string(),
+      score: z.number().optional(),
+      platform: z.string(),
+      style: z.string(),
+      interests: z.string(),
+      // Autres champs optionnels pour les fonctionnalités premium
+    }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const userId = ctx.session.user.id;
+        
+        // Générer un ID unique pour la bio
+        const bioId = nanoid();
+        
+        // Enregistrer la bio dans la base de données
+        await db.insert(generatedBios).values({
+          id: bioId,
+          userId: userId,
+          content: input.bio,
+          score: input.score || 0,
+          platform: input.platform,
+          style: input.style,
+          interests: input.interests,
+          createdAt: new Date(),
+        });
+        
+        return {
+          success: true,
+          bioId
+        };
+      } catch (error) {
+        console.error("Erreur lors de la sauvegarde de la bio:", error);
+        return {
+          success: false,
+          error: "Une erreur est survenue lors de la sauvegarde de votre bio."
         };
       }
     }),

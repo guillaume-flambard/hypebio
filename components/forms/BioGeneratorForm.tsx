@@ -74,6 +74,7 @@ export default function BioGeneratorForm() {
   const [activeTab, setActiveTab] = useState('bio');
   const [isPremiumFeatureSelected, setIsPremiumFeatureSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [optimizationTip, setOptimizationTip] = useState<string | null>("Pour améliorer votre score, essayez d'ajouter plus de détails sur vos intérêts spécifiques et utilisez quelques émojis pertinents.");
 
   const generateBioMutation = trpc.bio.generate.useMutation({
     onSuccess: (data: BioResponse) => {
@@ -150,9 +151,39 @@ export default function BioGeneratorForm() {
       return;
     }
     
+    // Assurez-vous que les champs requis sont définis (requis par GenerateInput)
+    if (!values.name) {
+      toast.error('Le nom est requis');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!values.platform) {
+      toast.error('La plateforme est requise');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!values.style) {
+      toast.error('Le style est requis');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!values.interests) {
+      toast.error('Les intérêts sont requis');
+      setIsLoading(false);
+      return;
+    }
+    
+    // Envoi de la mutation avec tous les champs requis explicitement définis
     generateBioMutation.mutate({
-      ...values,
-      isPremium: false, // En production, vérifiez si l'utilisateur a un abonnement premium
+      name: values.name,
+      platform: values.platform,
+      style: values.style,
+      interests: values.interests,
+      options: values.options,
+      isPremium: false,
     });
   };
 
@@ -171,226 +202,284 @@ export default function BioGeneratorForm() {
         className="flex flex-col gap-8"
       >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom ou pseudo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Votre nom ou pseudo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="platform"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plateforme</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez une plateforme" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="instagram">Instagram</SelectItem>
-                        <SelectItem value="tiktok">TikTok</SelectItem>
-                        <SelectItem value="twitter">Twitter</SelectItem>
-                        <SelectItem value="linkedin">LinkedIn</SelectItem>
-                        <SelectItem value="onlyfans">OnlyFans</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="style"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Style</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez un style" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="fun">Fun</SelectItem>
-                        <SelectItem value="professional">Professionnel</SelectItem>
-                        <SelectItem value="gaming">Gaming</SelectItem>
-                        <SelectItem value="sexy">Sexy</SelectItem>
-                        <SelectItem value="mysterious">Mystérieux</SelectItem>
-                        <SelectItem value="creative">Créatif</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="interests"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Intérêts (séparés par des virgules)</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Ex: voyage, photo, cuisine, sport..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-4 space-y-4">
-              <h3 className="font-medium text-lg">Options premium</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="options.generateBranding"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Branding Complet</FormLabel>
-                        <FormDescription className="text-xs">
-                          Générer nom, slogan et couleurs
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleOptionsChange();
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="options.generatePostIdeas"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Idées de posts</FormLabel>
-                        <FormDescription className="text-xs">
-                          Générer des idées et hashtags
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleOptionsChange();
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="options.generateResume"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Résumé professionnel</FormLabel>
-                        <FormDescription className="text-xs">
-                          Pour LinkedIn ou thread Twitter
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleOptionsChange();
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="options.optimizeInRealTime"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Score & Optimisation</FormLabel>
-                        <FormDescription className="text-xs">
-                          Analyse en temps réel de la bio
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleOptionsChange();
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="options.generateLinkInBio"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Link-in-bio</FormLabel>
-                        <FormDescription className="text-xs">
-                          Mini-site web automatique
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleOptionsChange();
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Styled Form Card with Gradient Border */}
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 md:p-8 border border-transparent relative before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-r before:from-purple-500 before:to-blue-500 before:-z-10 before:border-transparent">
+              <h3 className="text-xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+                Personnalisez votre bio
+              </h3>
               
-              {isPremiumFeatureSelected && (
-                <div className="bg-amber-50 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 rounded-lg p-3 text-amber-800 dark:text-amber-200 text-sm">
-                  ⚠️ Les options sélectionnées nécessitent un abonnement Premium ou Pro. <a href="/pricing" className="underline font-medium">Voir les tarifs</a>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                {/* Nom/Pseudo */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-sm font-medium mb-2">Nom ou pseudo</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Votre nom ou pseudo" 
+                            {...field} 
+                            className="w-full h-12 px-4 rounded-md border-gray-300 dark:border-gray-700 focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-900 transition-all" 
+                          />
+                        </FormControl>
+                        <FormMessage className="mt-1 text-xs" />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              )}
+
+                {/* Plateforme */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="platform"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-sm font-medium mb-2">Plateforme</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="w-full h-12 px-4 rounded-md border-gray-300 dark:border-gray-700 focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-900 transition-all">
+                              <SelectValue placeholder="Sélectionnez une plateforme" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="instagram">Instagram</SelectItem>
+                            <SelectItem value="tiktok">TikTok</SelectItem>
+                            <SelectItem value="twitter">Twitter</SelectItem>
+                            <SelectItem value="linkedin">LinkedIn</SelectItem>
+                            <SelectItem value="onlyfans">OnlyFans</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="mt-1 text-xs" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Style */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="style"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-sm font-medium mb-2">Style</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="w-full h-12 px-4 rounded-md border-gray-300 dark:border-gray-700 focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-900 transition-all">
+                              <SelectValue placeholder="Sélectionnez un style" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="fun">Fun</SelectItem>
+                            <SelectItem value="professional">Professionnel</SelectItem>
+                            <SelectItem value="gaming">Gaming</SelectItem>
+                            <SelectItem value="sexy">Sexy</SelectItem>
+                            <SelectItem value="mysterious">Mystérieux</SelectItem>
+                            <SelectItem value="creative">Créatif</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="mt-1 text-xs" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Intérêts */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="interests"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-sm font-medium mb-2">Intérêts (séparés par des virgules)</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Ex: voyage, photo, cuisine, sport..." 
+                            {...field} 
+                            className="w-full min-h-[96px] px-4 py-3 rounded-md resize-none border-gray-300 dark:border-gray-700 focus:border-purple-500 focus:ring focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
+                          />
+                        </FormControl>
+                        <FormMessage className="mt-1 text-xs" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Séparateur */}
+              <div className="my-8 border-t border-gray-200 dark:border-gray-800"></div>
+              
+              {/* Options Premium */}
+              <div>
+                <h4 className="text-md font-semibold mb-6">Options premium</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Branding */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="options.generateBranding"
+                      render={({ field }) => (
+                        <FormItem className="h-[76px] flex flex-row items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div>
+                            <FormLabel className="block text-sm font-medium">Branding</FormLabel>
+                            <FormDescription className="mt-1 text-xs text-gray-500">
+                              Générer un branding complet
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(value) => {
+                                field.onChange(value);
+                                handleOptionsChange();
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Posts */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="options.generatePostIdeas"
+                      render={({ field }) => (
+                        <FormItem className="h-[76px] flex flex-row items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div>
+                            <FormLabel className="block text-sm font-medium">Posts</FormLabel>
+                            <FormDescription className="mt-1 text-xs text-gray-500">
+                              Idées de contenu et hashtags
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(value) => {
+                                field.onChange(value);
+                                handleOptionsChange();
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Résumé */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="options.generateResume"
+                      render={({ field }) => (
+                        <FormItem className="h-[76px] flex flex-row items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div>
+                            <FormLabel className="block text-sm font-medium">Résumé</FormLabel>
+                            <FormDescription className="mt-1 text-xs text-gray-500">
+                              Résumé professionnel avancé
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(value) => {
+                                field.onChange(value);
+                                handleOptionsChange();
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  {/* Optimisation */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="options.optimizeInRealTime"
+                      render={({ field }) => (
+                        <FormItem className="h-[76px] flex flex-row items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div>
+                            <FormLabel className="block text-sm font-medium">Optimisation</FormLabel>
+                            <FormDescription className="mt-1 text-xs text-gray-500">
+                              Optimiser en temps réel
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(value) => {
+                                field.onChange(value);
+                                handleOptionsChange();
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Link in bio */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="options.generateLinkInBio"
+                      render={({ field }) => (
+                        <FormItem className="h-[76px] flex flex-row items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div>
+                            <FormLabel className="block text-sm font-medium">Link-in-bio</FormLabel>
+                            <FormDescription className="mt-1 text-xs text-gray-500">
+                              Mini-site de présentation
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(value) => {
+                                field.onChange(value);
+                                handleOptionsChange();
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                
+                {/* Alerte Premium */}
+                {isPremiumFeatureSelected && (
+                  <div className="mt-6 bg-amber-50 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 rounded-lg p-4 text-amber-800 dark:text-amber-200 text-sm">
+                    ⚠️ Les options sélectionnées nécessitent un abonnement Premium ou Pro. <a href="/pricing" className="underline font-medium">Voir les tarifs</a>
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Bouton de soumission */}
             <div className="flex justify-center">
               <Button 
                 type="submit" 
-                className="w-full md:w-auto bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition-all"
                 disabled={isLoading}
+                className="px-10 py-6 text-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition-all shadow-md hover:shadow-lg"
               >
-                {isLoading ? 'Génération...' : 'Générer ma bio 🚀'}
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Génération en cours...
+                  </>
+                ) : (
+                  "Générer ma bio"
+                )}
               </Button>
             </div>
           </form>
@@ -404,7 +493,14 @@ export default function BioGeneratorForm() {
           >
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-2 md:grid-cols-5">
-                <TabsTrigger value="bio">Bio</TabsTrigger>
+                <TabsTrigger value="bio" className="flex items-center gap-2">
+                  <span>Bio</span>
+                  {bioScore && (
+                    <span className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 text-xs py-0.5 px-1.5 rounded-full">
+                      {bioScore}
+                    </span>
+                  )}
+                </TabsTrigger>
                 <TabsTrigger value="branding" disabled={!branding}>Branding</TabsTrigger>
                 <TabsTrigger value="posts" disabled={!postIdeas}>Posts & Hashtags</TabsTrigger>
                 <TabsTrigger value="resume" disabled={!resume}>Résumé</TabsTrigger>
@@ -503,9 +599,10 @@ export default function BioGeneratorForm() {
                           <h3 className="text-lg font-semibold mb-3">Idées de posts :</h3>
                           <ul className="space-y-2">
                             {postIdeas.map((idea, index) => (
-                              <li key={index} className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
-                                {idea}
+                              <li key={index} className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md flex justify-between items-center">
+                                <span>{idea}</span>
                                 <Button onClick={() => copyToClipboard(idea)} variant="ghost" size="sm" className="ml-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                   Copier
                                 </Button>
                               </li>
@@ -523,6 +620,7 @@ export default function BioGeneratorForm() {
                             ))}
                           </div>
                           <Button onClick={() => copyToClipboard(hashtags.join(' '))} variant="outline" className="w-full mt-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             Copier tous les hashtags
                           </Button>
                         </div>
@@ -551,6 +649,7 @@ export default function BioGeneratorForm() {
                           {resume}
                         </div>
                         <Button onClick={() => copyToClipboard(resume)} variant="outline" className="w-full">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                           Copier le résumé
                         </Button>
                       </div>
@@ -580,7 +679,7 @@ export default function BioGeneratorForm() {
                             <span className="text-sm font-medium">Score global</span>
                             <span className="text-sm font-medium">{bioScore}/100</span>
                           </div>
-                          <Progress value={bioScore || 0} className="h-2 mb-4" />
+                          <Progress value={bioScore || 0} className="h-3 mb-4" />
                           
                           <div className="space-y-3">
                             <div>
@@ -617,9 +716,11 @@ export default function BioGeneratorForm() {
                           </div>
                         </div>
                         
-                        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-blue-800 dark:text-blue-200 text-sm">
-                          💡 <strong>Conseil d&apos;optimisation :</strong> Pour améliorer votre score, essayez d&apos;ajouter plus de détails sur vos intérêts spécifiques et utilisez quelques émojis pertinents.
-                        </div>
+                        {optimizationTip && (
+                          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-blue-800 dark:text-blue-200 text-sm">
+                            💡 <strong>Conseil d&apos;optimisation :</strong> {optimizationTip}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8">

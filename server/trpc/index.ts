@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { ZodError } from 'zod';
 import { type Session } from 'next-auth';
 import { bioRouter } from './routers/bio';
-import { publicProcedure, privateProcedure, router } from '../trpc';
+import { router } from '../trpc';
 
 type Context = {
   session: Session | null;
@@ -36,7 +36,8 @@ const t = initTRPC.context<Context>().create({
   },
 });
 
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+// Ce middleware est utilisé dans ../trpc.ts pour définir privateProcedure
+export const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
@@ -51,6 +52,4 @@ export const appRouter = router({
   bio: bioRouter,
 });
 
-export type AppRouter = typeof appRouter;
-
-export { publicProcedure, privateProcedure, router }; 
+export type AppRouter = typeof appRouter; 

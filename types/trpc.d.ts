@@ -51,10 +51,10 @@ interface MyBiosResponse {
 
 // Type pour les paramètres de génération
 interface GenerateInput {
-  name?: string;
-  platform?: string;
-  style?: string;
-  interests?: string;
+  name: string;
+  platform: string;
+  style: string;
+  interests: string;
   isPremium?: boolean;
   options?: {
     generateBranding?: boolean;

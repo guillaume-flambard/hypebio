@@ -4,7 +4,7 @@ import { generateBio } from '@/lib/openai';
 import { db } from '@/lib/db';
 import { generatedBios } from '@/lib/db/schema';
 import { nanoid } from 'nanoid';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 
 export const bioRouter = router({
   generate: publicProcedure
@@ -19,16 +19,30 @@ export const bioRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const bioContent = await generateBio(input);
+        if (!input.name || !input.platform || !input.style || !input.interests) {
+          throw new Error('Données manquantes pour générer la bio');
+        }
+        
+        const bioContent = await generateBio({
+          name: input.name,
+          platform: input.platform,
+          style: input.style,
+          interests: input.interests,
+          isPremium: input.isPremium
+        });
 
-        if (ctx.session?.user) {
-          await db.insert(generatedBios).values({
-            id: nanoid(),
-            userId: ctx.session.user.id,
-            platform: input.platform,
-            style: input.style,
-            content: bioContent || '',
-          });
+        if (ctx.session?.user?.id) {
+          await sql`
+            INSERT INTO generatedBio (id, userId, platform, style, content, createdAt)
+            VALUES (
+              ${nanoid()},
+              ${ctx.session.user.id},
+              ${input.platform},
+              ${input.style},
+              ${bioContent || ''},
+              ${Date.now()}
+            )
+          `;
         }
 
         return { success: true, bio: bioContent };

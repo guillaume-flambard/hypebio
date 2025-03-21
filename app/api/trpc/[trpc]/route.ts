@@ -1,5 +1,6 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { appRouter, createTRPCContext } from '@/server/trpc';
+import { appRouter } from '@/server/trpc/index';
+import { createTRPCContext } from '@/server/trpc';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
