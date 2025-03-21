@@ -66,6 +66,15 @@ type BioResponse = {
   postIdeas?: string[];
   hashtags?: string[];
   resume?: string;
+  linkInBio?: {
+    sections: Array<{
+      title: string;
+      content?: string;
+      links?: Array<{ label: string; url: string }>;
+    }>;
+    cta: string;
+    themeColor: string;
+  };
   error?: string;
 };
 
@@ -77,6 +86,7 @@ export default function BioGeneratorForm() {
   const [postIdeas, setPostIdeas] = useState<string[] | null>(null);
   const [hashtags, setHashtags] = useState<string[] | null>(null);
   const [resume, setResume] = useState<string | null>(null);
+  const [linkInBio, setLinkInBio] = useState<BioResponse['linkInBio'] | null>(null);
   const [activeTab, setActiveTab] = useState('bio');
   const [isPremiumFeatureSelected, setIsPremiumFeatureSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +103,7 @@ export default function BioGeneratorForm() {
         setPostIdeas(data.postIdeas || null);
         setHashtags(data.hashtags || null);
         setResume(data.resume || null);
+        setLinkInBio(data.linkInBio || null);
         
         // Si on a générés des éléments supplémentaires, changer l'onglet actif pour l'élément le plus important
         if (data.branding) setActiveTab('branding');
@@ -139,12 +150,13 @@ export default function BioGeneratorForm() {
     
     // Check if user has selected premium features
     const hasPremiumFeature = Object.values(values.options).some(value => value === true);
+    let isPremiumUser = false;
     
     if (hasPremiumFeature) {
       // Allow titi@gmail.com to use premium features
-      const isUserPremium = localStorage.getItem('userEmail') === 'titi@gmail.com';
+      isPremiumUser = localStorage.getItem('userEmail') === 'titi@gmail.com';
       
-      if (!isUserPremium) {
+      if (!isPremiumUser) {
         // En production, vérifiez si l'utilisateur a un compte premium
         // Pour l'instant, simulons une redirection vers la page de tarification
         toast.error('Cette fonctionnalité nécessite un compte premium!');
@@ -194,7 +206,7 @@ export default function BioGeneratorForm() {
       style: values.style,
       interests: values.interests,
       options: values.options,
-      isPremium: false,
+      isPremium: isPremiumUser,
     });
   };
 
@@ -495,12 +507,13 @@ export default function BioGeneratorForm() {
               </div>
               
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full grid grid-cols-2 md:grid-cols-5 mb-6">
+                <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 mb-6">
                   <TabsTrigger value="bio">Bio</TabsTrigger>
                   <TabsTrigger value="branding" disabled={!branding}>Branding</TabsTrigger>
                   <TabsTrigger value="postIdeas" disabled={!postIdeas}>Posts</TabsTrigger>
                   <TabsTrigger value="resume" disabled={!resume}>CV</TabsTrigger>
                   <TabsTrigger value="score" disabled={!scoreDetails}>Analyse</TabsTrigger>
+                  <TabsTrigger value="linkInBio" disabled={!linkInBio}>Link in Bio</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="bio" className="mt-0">
@@ -718,6 +731,90 @@ export default function BioGeneratorForm() {
                     </Card>
                   )}
                 </TabsContent>
+                
+                <TabsContent value="linkInBio" className="mt-0">
+                  {linkInBio ? (
+                    <Card className="border-0 shadow-sm bg-white dark:bg-gray-800">
+                      <CardContent className="p-6">
+                        <div className="mb-4 rounded-md">
+                          <h3 className="text-lg font-medium mb-3">Votre Link in Bio</h3>
+                          
+                          {linkInBio.sections.map((section, index) => (
+                            <div key={index} className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md">
+                              <h4 className="font-medium text-md mb-2">{section.title}</h4>
+                              
+                              {section.content && (
+                                <p className="text-gray-700 dark:text-gray-300 mb-2">{section.content}</p>
+                              )}
+                              
+                              {section.links && section.links.length > 0 && (
+                                <div className="flex flex-col gap-2 mt-2">
+                                  {section.links.map((link, linkIndex) => (
+                                    <div key={linkIndex} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                                      <span className="font-medium">{link.label}:</span>
+                                      <span className="text-indigo-600 dark:text-indigo-400">{link.url}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                          
+                          <div className="mt-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-md border border-indigo-100 dark:border-indigo-800">
+                            <p className="font-medium text-indigo-700 dark:text-indigo-300">{linkInBio.cta}</p>
+                          </div>
+                          
+                          <div className="mt-4 flex items-center gap-2">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Couleur du thème:</span>
+                            <div 
+                              className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600" 
+                              style={{ backgroundColor: linkInBio.themeColor }}
+                            ></div>
+                            <span className="text-sm font-mono">{linkInBio.themeColor}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(JSON.stringify(linkInBio, null, 2))}
+                                  className="text-gray-500 border-gray-200 dark:border-gray-700"
+                                >
+                                  <Copy className="mr-2 h-4 w-4" /> Exporter
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Exporter les données du Link in Bio</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card className="border-0 shadow-sm bg-white dark:bg-gray-800">
+                      <CardContent className="p-6 flex flex-col items-center justify-center min-h-[200px]">
+                        <p className="text-gray-500 dark:text-gray-400 text-center">
+                          Activez l&apos;option Link-in-bio dans les fonctionnalités premium pour générer ces informations.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          className="mt-4 border-gray-200 dark:border-gray-700"
+                          onClick={() => {
+                            form.setValue("options.generateLinkInBio", true);
+                            setActiveTab("bio");
+                          }}
+                        >
+                          Activer maintenant
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
               </Tabs>
               
               <div className="flex flex-col gap-4 mt-4">
@@ -736,6 +833,7 @@ export default function BioGeneratorForm() {
                     setHashtags(null);
                     setResume(null);
                     setScoreDetails(null);
+                    setLinkInBio(null);
                     form.reset();
                   }}
                   variant="link"

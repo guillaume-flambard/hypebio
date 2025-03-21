@@ -37,6 +37,7 @@ export type BioResponse = {
     engagement: number;
     uniqueness: number;
     platformRelevance: number;
+    analysis?: string;
   };
   branding?: {
     username: string;
@@ -46,6 +47,15 @@ export type BioResponse = {
   postIdeas?: string[];
   hashtags?: string[];
   resume?: string;
+  linkInBio?: {
+    sections: Array<{
+      title: string;
+      content?: string;
+      links?: Array<{ label: string; url: string }>;
+    }>;
+    cta: string;
+    themeColor: string;
+  };
   error?: string;
 };
 
@@ -130,6 +140,32 @@ function buildPrompt(options: GenerateOptions): string {
     if (premiumOptions.generateResume) {
       prompt += `
       "resume": "Un résumé professionnel pour ${name} basé sur ${interests} et adapté pour ${platform}",
+      `;
+    }
+    
+    if (premiumOptions.optimizeInRealTime) {
+      prompt += `
+      "scoreDetails": {
+        "readability": 80, // Entre 0 et 100
+        "engagement": 85, // Entre 0 et 100
+        "uniqueness": 75, // Entre 0 et 100
+        "platformRelevance": 90, // Entre 0 et 100
+        "analysis": "Une analyse détaillée (300-500 caractères) des points forts et faibles de la bio, avec des conseils spécifiques pour améliorer chaque aspect: lisibilité, engagement, unicité et pertinence pour la plateforme ${platform}."
+      },
+      `;
+    }
+    
+    if (premiumOptions.generateLinkInBio) {
+      prompt += `
+      "linkInBio": {
+        "sections": [
+          {"title": "À propos", "content": "Texte de présentation court et efficace"},
+          {"title": "Liens", "links": [{"label": "Site web", "url": "example.com"}, {"label": "Portfolio", "url": "example.com/portfolio"}]},
+          {"title": "Projets", "content": "Description des projets principaux"}
+        ],
+        "cta": "Texte d'appel à l'action principal",
+        "themeColor": "#couleur" // Couleur principale pour le thème
+      },
       `;
     }
   }
