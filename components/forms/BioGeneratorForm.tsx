@@ -86,9 +86,18 @@ export interface BioGeneratorFormProps {
     style?: string;
     interests?: string;
   };
+  examples?: Array<{
+    id: string;
+    name: string;
+    platform: string;
+    style: string;  
+    interests: string;
+    label: string;
+  }>;
+  onExampleClick?: (example: any) => void;
 }
 
-export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormProps) {
+export default function BioGeneratorForm({ prefilledValues, examples = [], onExampleClick }: BioGeneratorFormProps) {
   const [generatedBio, setGeneratedBio] = useState<string | null>(null);
   const [bioScore, setBioScore] = useState<number | null>(null);
   const [scoreDetails, setScoreDetails] = useState<BioResponse['scoreDetails'] | null>(null);
@@ -268,13 +277,13 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
       <div className="grid md:grid-cols-2 gap-0">
         {/* Formulaire */}
         <motion.div 
-          className="p-6 md:p-8 border-r border-gray-100 dark:border-gray-800"
+          className="p-5 border-r border-gray-100 dark:border-gray-800"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
           <motion.div 
-            className="mb-6"
+            className="mb-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
@@ -286,7 +295,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
           </motion.div>
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -297,10 +306,10 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                       <Input 
                         placeholder="Entrez votre nom ou pseudo" 
                         {...field}
-                        className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500"
+                        className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500 py-2 w-full"
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-xs">
                       Le nom qui apparaîtra dans votre bio
                     </FormDescription>
                     <FormMessage />
@@ -308,7 +317,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                 )}
               />
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="platform"
@@ -317,7 +326,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                       <FormLabel>Plateforme</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500">
+                          <SelectTrigger className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500 py-2 w-full">
                             <SelectValue placeholder="Sélectionnez une plateforme" />
                           </SelectTrigger>
                         </FormControl>
@@ -329,7 +338,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                           <SelectItem value="onlyfans">OnlyFans</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormDescription>
+                      <FormDescription className="text-xs">
                         La plateforme où vous utiliserez cette bio
                       </FormDescription>
                       <FormMessage />
@@ -345,7 +354,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                       <FormLabel>Style</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500">
+                          <SelectTrigger className="border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500 py-2 w-full">
                             <SelectValue placeholder="Sélectionnez un style" />
                           </SelectTrigger>
                         </FormControl>
@@ -358,7 +367,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                           <SelectItem value="creative">Créatif</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormDescription>
+                      <FormDescription className="text-xs">
                         Le ton et le style de votre bio
                       </FormDescription>
                       <FormMessage />
@@ -376,11 +385,11 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     <FormControl>
                       <Textarea
                         placeholder="Vos centres d'intérêt (séparés par des virgules)"
-                        className="resize-none border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500"
+                        className="resize-none border-gray-200 dark:border-gray-700 focus-visible:ring-indigo-500 min-h-[80px]"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-xs">
                       Vos passions, hobbies et sujets préférés (séparés par des virgules)
                     </FormDescription>
                     <FormMessage />
@@ -392,7 +401,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h4 className="font-medium">Options Premium</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">
                       Fonctionnalités exclusives pour les comptes premium
                     </p>
                   </div>
@@ -400,18 +409,18 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     Premium
                   </Badge>
                 </div>
-                <Separator className="mb-4" />
+                <Separator className="mb-2" />
                 
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="options.generateBranding"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between space-y-0">
+                      <FormItem className="flex flex-row items-start justify-between space-y-0">
                         <div className="space-y-0.5">
-                          <FormLabel className="font-medium">Branding</FormLabel>
+                          <FormLabel className="font-medium text-sm">Branding</FormLabel>
                           <FormDescription className="text-xs">
-                            Générer nom d&apos;utilisateur, palette de couleurs et tone de voix
+                            Nom, couleurs, tone
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -432,11 +441,11 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     control={form.control}
                     name="options.generatePostIdeas"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between space-y-0">
+                      <FormItem className="flex flex-row items-start justify-between space-y-0">
                         <div className="space-y-0.5">
-                          <FormLabel className="font-medium">Idées de posts</FormLabel>
+                          <FormLabel className="font-medium text-sm">Idées de posts</FormLabel>
                           <FormDescription className="text-xs">
-                            Suggestions de contenu adaptées à votre bio
+                            Suggestions de contenu
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -457,11 +466,11 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     control={form.control}
                     name="options.generateResume"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between space-y-0">
+                      <FormItem className="flex flex-row items-start justify-between space-y-0">
                         <div className="space-y-0.5">
-                          <FormLabel className="font-medium">Résumé pro</FormLabel>
+                          <FormLabel className="font-medium text-sm">Résumé pro</FormLabel>
                           <FormDescription className="text-xs">
-                            CV court pour LinkedIn et profils professionnels
+                            CV pour profils pro
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -482,11 +491,11 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     control={form.control}
                     name="options.optimizeInRealTime"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between space-y-0">
+                      <FormItem className="flex flex-row items-start justify-between space-y-0">
                         <div className="space-y-0.5">
-                          <FormLabel className="font-medium">Optimisation temps réel</FormLabel>
+                          <FormLabel className="font-medium text-sm">Optimisation</FormLabel>
                           <FormDescription className="text-xs">
-                            Analyse et suggestions d&apos;amélioration détaillées
+                            Analyse détaillée
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -507,11 +516,11 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
                     control={form.control}
                     name="options.generateLinkInBio"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between space-y-0">
+                      <FormItem className="flex flex-row items-start justify-between space-y-0">
                         <div className="space-y-0.5">
-                          <FormLabel className="font-medium">Link-in-bio</FormLabel>
+                          <FormLabel className="font-medium text-sm">Link-in-bio</FormLabel>
                           <FormDescription className="text-xs">
-                            Générer un mini-site adapté pour tous vos liens
+                            Mini-site pour liens
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -533,11 +542,12 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                className="mt-4"
               >
                 <Button 
                   type="submit" 
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-4"
                 >
                   {isLoading ? (
                     <>
@@ -552,7 +562,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
         
         {/* Résultats */}
         <motion.div 
-          className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900/50"
+          className="p-5 bg-gray-50 dark:bg-gray-900/50"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -588,9 +598,7 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
 
                 {/* Section d'analyse globale */}
                 {scoreDetails && (
-                  <motion.div
-                    variants={itemVariants}
-                  >
+                  <motion.div variants={itemVariants}>
                     <motion.div
                       variants={cardVariants}
                       whileHover="hover"
@@ -972,95 +980,74 @@ export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormPr
               </motion.div>
             ) : (
               <motion.div 
-                className="flex flex-col items-center justify-center h-full min-h-[400px] text-center"
+                className="flex flex-col h-full"
                 key="empty"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
               >
-                <motion.div 
-                  className="text-7xl mb-6"
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, 0, -5, 0]
-                  }}
-                  transition={{ 
-                    duration: 3, 
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                  }}
-                >✨</motion.div>
-                <motion.h3 
-                  className="text-xl font-medium mb-2"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >Votre bio apparaîtra ici</motion.h3>
-                <motion.p 
-                  className="text-gray-500 dark:text-gray-400 mb-8 max-w-md"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  Remplissez le formulaire et cliquez sur &quot;Générer ma bio&quot; pour créer une bio optimisée pour votre plateforme.
-                </motion.p>
-                <motion.div 
-                  className="grid grid-cols-2 gap-4 max-w-md w-full"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{
-                    hidden: { opacity: 0 },
-                    visible: {
-                      opacity: 1,
-                      transition: {
-                        staggerChildren: 0.1,
-                        delayChildren: 0.4
-                      }
-                    }
-                  }}
-                >
-                  {[
-                    { icon: "🔥", text: "Engagement accru" },
-                    { icon: "⚡️", text: "Rapide et efficace" },
-                    { icon: "🎯", text: "Bio optimisée" },
-                    { icon: "🔄", text: "Générez à volonté" }
-                  ].map((item, index) => (
-                    <motion.div 
-                      key={index}
-                      className="bg-gray-100 dark:bg-gray-800/50 rounded-md p-3 text-center"
-                      variants={{
-                        hidden: { y: 20, opacity: 0 },
-                        visible: { 
-                          y: 0, 
-                          opacity: 1,
-                          transition: {
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 24
-                          }
-                        }
-                      }}
-                      whileHover={{ 
-                        scale: 1.05, 
-                        boxShadow: "0 10px 15px rgba(0,0,0,0.1)" 
-                      }}
-                    >
-                      <motion.span 
-                        className="block text-2xl mb-1"
-                        animate={{ 
-                          y: [0, -5, 0],
-                        }}
-                        transition={{ 
-                          duration: 1.5, 
-                          repeat: Infinity,
-                          repeatType: "reverse",
-                          delay: index * 0.2
-                        }}
-                      >{item.icon}</motion.span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{item.text}</span>
-                    </motion.div>
-                  ))}
-                </motion.div>
+                <div className="text-center p-4">
+                  <h3 className="text-xl font-medium mb-2">Votre bio apparaîtra ici</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Complétez le formulaire pour générer une bio personnalisée
+                  </p>
+                </div>
+                
+                {/* Templates/Examples section avec style inspiré de ChatGPT */}
+                {examples.length > 0 && (
+                  <div className="px-4 mb-4">
+                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Essayez ces exemples :</h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      {examples.map((example) => (
+                        <button 
+                          key={example.id}
+                          className="text-left bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 rounded-md p-3 cursor-pointer transition-colors border border-gray-100 dark:border-gray-700 w-full"
+                          onClick={() => {
+                            // Toujours mettre à jour les valeurs du formulaire
+                            form.setValue("name", example.name);
+                            form.setValue("platform", example.platform as "tiktok" | "instagram" | "twitter" | "linkedin" | "onlyfans");
+                            form.setValue("style", example.style as "fun" | "professional" | "gaming" | "sexy" | "mysterious" | "creative");
+                            form.setValue("interests", example.interests);
+                            
+                            // Si onExampleClick est fourni, l'appeler également
+                            if (onExampleClick) {
+                              onExampleClick(example);
+                            }
+                          }}
+                        >
+                          <div className="font-medium text-sm mb-1">{example.label}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 flex gap-2">
+                            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full">
+                              {example.platform}
+                            </span>
+                            <span className="inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full">
+                              {example.style}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="mt-auto p-4 border-t border-gray-100 dark:border-gray-800">
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { icon: "🔥", text: "Engagement accru" },
+                      { icon: "⚡️", text: "Rapide et efficace" },
+                      { icon: "🎯", text: "Bio optimisée" },
+                      { icon: "🔄", text: "Générez à volonté" }
+                    ].map((item, index) => (
+                      <div 
+                        key={index}
+                        className="bg-gray-50 dark:bg-gray-800/50 rounded-md p-2 text-center"
+                      >
+                        <span className="text-lg mr-1">{item.icon}</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-400">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

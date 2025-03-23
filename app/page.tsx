@@ -234,7 +234,7 @@ export default function Home() {
         
         {/* Générateur - Section principale */}
         <section id="generator" className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="container mx-auto px-4">
+          <div className="container max-w-8xl mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -256,33 +256,17 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.7 }}
-              className="max-w-5xl mx-auto"
+              className="max-w-7xl mx-auto"
             >
               <Card className="border-0 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-gray-800">
                 <CardContent className="p-0">
-                  <BioGeneratorForm prefilledValues={selectedExample}/>
+                  <BioGeneratorForm 
+                    prefilledValues={selectedExample} 
+                    examples={EXAMPLES}
+                    onExampleClick={handleExampleClick}
+                  />
                 </CardContent>
               </Card>
-              
-              {/* Suggestions d'exemples */}
-              <motion.div 
-                className="mt-8 flex flex-wrap gap-3 justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <p className="w-full text-center text-sm text-gray-500 dark:text-gray-400 mb-2">Ou essayez un exemple :</p>
-                {EXAMPLES.map((example) => (
-                  <motion.div 
-                    key={example.id}
-                    whileHover={{ scale: 1.03, boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }} 
-                    className="bg-white dark:bg-gray-800 rounded-full px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer transition-colors hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-                    onClick={() => handleExampleClick(example)}
-                  >
-                    {example.label}
-                  </motion.div>
-                ))}
-              </motion.div>
             </motion.div>
           </div>
         </section>
