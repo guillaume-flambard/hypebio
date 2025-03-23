@@ -79,7 +79,16 @@ type BioResponse = {
   error?: string;
 };
 
-export default function BioGeneratorForm() {
+export interface BioGeneratorFormProps {
+  prefilledValues?: {
+    name?: string;
+    platform?: string;
+    style?: string;
+    interests?: string;
+  };
+}
+
+export default function BioGeneratorForm({ prefilledValues }: BioGeneratorFormProps) {
   const [generatedBio, setGeneratedBio] = useState<string | null>(null);
   const [bioScore, setBioScore] = useState<number | null>(null);
   const [scoreDetails, setScoreDetails] = useState<BioResponse['scoreDetails'] | null>(null);

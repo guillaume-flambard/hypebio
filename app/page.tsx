@@ -1,516 +1,254 @@
 'use client';
 
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import BioGeneratorForm from "@/components/forms/BioGeneratorForm";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import BioGeneratorForm, { BioGeneratorFormProps } from "@/components/forms/BioGeneratorForm";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowRight, Sparkles, Target, Zap } from "lucide-react";
+
+// Définition des exemples prédéfinis
+const EXAMPLES = [
+  {
+    id: "instagram-lifestyle",
+    name: "Voyageur Nomade",
+    platform: "instagram",
+    style: "fun",
+    interests: "voyage, photographie, cuisine, découvertes culturelles, sunset",
+    label: "Bio Instagram lifestyle & voyage"
+  },
+  {
+    id: "linkedin-pro",
+    name: "Jean Dupont",
+    platform: "linkedin",
+    style: "professional",
+    interests: "développement logiciel, gestion de projet, leadership, innovation, technologies cloud",
+    label: "Profil professionnel LinkedIn"
+  },
+  {
+    id: "tiktok-artist",
+    name: "CreativeMind",
+    platform: "tiktok",
+    style: "creative",
+    interests: "art digital, peinture, musique, danse, vidéo, créativité, expression artistique",
+    label: "Bio créative pour artiste TikTok"
+  }
+];
 
 export default function Home() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [selectedExample, setSelectedExample] = useState(null);
+  
+  useEffect(() => {
+    // Vérifier si un exemple est sélectionné dans l'URL
+    const exampleId = searchParams.get('example');
+    if (exampleId) {
+      const example = EXAMPLES.find(ex => ex.id === exampleId);
+      if (example) {
+        setSelectedExample(example);
       }
     }
-  };
-
-  const heroText = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        type: "spring", 
-        stiffness: 100,
-        damping: 12 
+  }, [searchParams]);
+  
+  const handleExampleClick = (example) => {
+    // D'abord mettre à jour l'état local
+    setSelectedExample(example);
+    
+    // Ensuite, mettre à jour les paramètres d'URL sans redirection complète
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('example', example.id);
+    params.set('name', example.name);
+    params.set('platform', example.platform);
+    params.set('style', example.style);
+    params.set('interests', example.interests);
+    
+    // Mettre à jour l'URL de manière douce sans recharger la page
+    window.history.pushState({}, '', `${window.location.pathname}#generator?${params.toString()}`);
+    
+    // Délai court pour s'assurer que le DOM a été mis à jour
+    setTimeout(() => {
+      // Faire défiler vers la section du générateur
+      const generatorElement = document.getElementById('generator');
+      if (generatorElement) {
+        generatorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }
-  };
-
-  const cardHover = {
-    hover: { 
-      y: -10, 
-      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-      transition: { type: "spring", stiffness: 400, damping: 10 }
-    }
+    }, 100);
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <Header />
       
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
-          <div className="container mx-auto px-4">
+      <main>
+        {/* Hero Section - Minimaliste et élégant */}
+        <section className="relative py-20 lg:py-32 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/30 z-0"></div>
+          
+          {/* Éléments décoratifs subtils */}
+          <div className="absolute w-full h-full">
             <motion.div 
-              className="flex flex-col items-center text-center"
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              <motion.div variants={heroText}>
-                <Badge variant="outline" className="mb-6 px-3 py-1 text-sm bg-white/10 border-white/20 hover:bg-white/20">
-                  Boostez vos réseaux sociaux
-                </Badge>
-              </motion.div>
-              <motion.h1 
-                className="text-4xl md:text-6xl font-bold mb-6 text-white"
-                variants={heroText}
-              >
-                Générez des Bios Virales en Quelques Secondes
-              </motion.h1>
-              <motion.p 
-                className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl"
-                variants={heroText}
-              >
-                HypeBio crée automatiquement des bios optimisées pour TikTok, Instagram, Twitter, LinkedIn et OnlyFans. Boostez votre présence en ligne dès maintenant !
-              </motion.p>
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4"
-                variants={heroText}
-              >
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild size="lg" className="bg-white text-indigo-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all">
-                    <a href="#generator">Générer ma bio</a>
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
-                    <Link href="/examples">Voir des exemples</Link>
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Features Section - Expanded with more benefits */}
-        <section className="py-16 bg-white dark:bg-gray-950">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeIn}
-            >
-              <h2 className="text-3xl font-bold text-center mb-6">Pourquoi choisir HypeBio ?</h2>
-              <p className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
-                Notre technologie d&apos;IA avancée crée des bios captivantes qui génèrent plus d&apos;engagement
-              </p>
-            </motion.div>
-            
+              className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-indigo-400/10 dark:bg-indigo-400/5 blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                x: [0, 30, 0],
+                y: [0, -30, 0],
+              }}
+              transition={{
+                duration: 15,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={staggerContainer}
-            >
-              <motion.div variants={fadeIn} whileHover={cardHover.hover}>
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardHeader>
-                    <motion.div 
-                      className="text-3xl mb-4"
-                      animate={{ 
-                        y: [0, -5, 0],
-                        rotate: [0, 5, 0, -5, 0]
-                      }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity,
-                        repeatType: "reverse"
-                      }}
-                    >⚡️</motion.div>
-                    <CardTitle>Rapide et Efficace</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Générez une bio optimisée en quelques secondes, sans effort et adaptée à votre style.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div 
-                variants={fadeIn} 
-                whileHover={cardHover.hover}
-                transition={{ delay: 0.1 }}
-              >
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardHeader>
-                    <motion.div 
-                      className="text-3xl mb-4"
-                      animate={{ 
-                        y: [0, -5, 0],
-                        rotate: [0, 5, 0, -5, 0]
-                      }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        delay: 0.5
-                      }}
-                    >🎯</motion.div>
-                    <CardTitle>Optimisé par Plateforme</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Chaque bio est spécifiquement adaptée aux exigences et au format de la plateforme choisie.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div 
-                variants={fadeIn} 
-                whileHover={cardHover.hover}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardHeader>
-                    <motion.div 
-                      className="text-3xl mb-4"
-                      animate={{ 
-                        y: [0, -5, 0],
-                        rotate: [0, 5, 0, -5, 0]
-                      }}
-                      transition={{ 
-                        duration: 3, 
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        delay: 1
-                      }}
-                    >🔥</motion.div>
-                    <CardTitle>Style Personnalisé</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Choisissez parmi différents styles pour correspondre à votre personnalité et votre audience.
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </motion.div>
+              className="absolute bottom-1/3 left-1/3 w-96 h-96 rounded-full bg-purple-400/10 dark:bg-purple-400/5 blur-3xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                x: [0, -40, 0],
+                y: [0, 40, 0],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
           </div>
-        </section>
-
-        {/* Premium Features Section - Condensed */}
-        <section className="py-16 bg-slate-50 dark:bg-slate-900">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeIn}
-            >
-              <h2 className="text-3xl font-bold text-center mb-4">Fonctionnalités Premium</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 text-center mb-12 max-w-3xl mx-auto">
-                Découvrez nos outils avancés pour optimiser votre présence en ligne
-              </p>
-            </motion.div>
-            
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeIn}
-            >
-              <Tabs defaultValue="branding" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8">
-                  <TabsTrigger value="branding">Branding</TabsTrigger>
-                  <TabsTrigger value="score">Analyse</TabsTrigger>
-                  <TabsTrigger value="content">Contenu</TabsTrigger>
-                  <TabsTrigger value="advanced">Avancé</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="branding">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Card className="border-0 shadow-lg">
-                      <CardHeader>
-                        <div className="flex items-center mb-2">
-                          <motion.div 
-                            className="text-3xl mr-4"
-                            animate={{ 
-                              rotate: [0, 10, 0, -10, 0],
-                              scale: [1, 1.1, 1]
-                            }}
-                            transition={{ 
-                              duration: 3, 
-                              repeat: Infinity,
-                              repeatType: "reverse"
-                            }}
-                          >🎨</motion.div>
-                          <CardTitle>Branding Complet</CardTitle>
-                        </div>
-                        <CardDescription>
-                          Créez une identité visuelle cohérente et professionnelle
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Générez un ensemble complet avec bio, nom d&apos;utilisateur, slogan et palette de couleurs. Créez une identité visuelle cohérente sur tous vos réseaux.
-                        </p>
-                        <motion.div 
-                          className="flex justify-end"
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          <Button asChild variant="default" className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                            <Link href="/pricing">
-                              Voir les forfaits
-                            </Link>
-                          </Button>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </TabsContent>
-                
-                <TabsContent value="score">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Card className="border-0 shadow-lg">
-                      <CardHeader>
-                        <div className="flex items-center mb-2">
-                          <motion.div 
-                            className="text-3xl mr-4"
-                            animate={{ 
-                              y: [0, -5, 0],
-                              scale: [1, 1.1, 1]
-                            }}
-                            transition={{ 
-                              duration: 2, 
-                              repeat: Infinity,
-                              repeatType: "reverse"
-                            }}
-                          >📊</motion.div>
-                          <CardTitle>Score et Optimisation</CardTitle>
-                        </div>
-                        <CardDescription>
-                          Analysez et améliorez l'impact de vos bios
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Obtenez un score détaillé de votre bio avec conseils d&apos;optimisation en temps réel. Analysez la lisibilité, l&apos;engagement et la pertinence pour maximiser votre impact.
-                        </p>
-                        <motion.div 
-                          className="flex justify-end"
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          <Button asChild variant="default" className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                            <Link href="/pricing">
-                              Voir les forfaits
-                            </Link>
-                          </Button>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </TabsContent>
-                
-                <TabsContent value="content">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Card className="border-0 shadow-lg">
-                      <CardHeader>
-                        <div className="flex items-center mb-2">
-                          <motion.div 
-                            className="text-3xl mr-4"
-                            animate={{ 
-                              rotateZ: [0, 10, 0, -10, 0]
-                            }}
-                            transition={{ 
-                              duration: 4, 
-                              repeat: Infinity,
-                              repeatType: "reverse"
-                            }}
-                          >📝</motion.div>
-                          <CardTitle>Contenu et Stratégie</CardTitle>
-                        </div>
-                        <CardDescription>
-                          Des outils pour planifier et optimiser votre présence
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Générez automatiquement des idées de posts, des hashtags optimisés et construisez une stratégie cohérente pour augmenter votre visibilité et votre engagement.
-                        </p>
-                        <motion.div 
-                          className="flex justify-end"
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          <Button asChild variant="default" className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                            <Link href="/pricing">
-                              Voir les forfaits
-                            </Link>
-                          </Button>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </TabsContent>
-                
-                <TabsContent value="advanced">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Card className="border-0 shadow-lg">
-                      <CardHeader>
-                        <div className="flex items-center mb-2">
-                          <motion.div 
-                            className="text-3xl mr-4"
-                            animate={{ 
-                              rotate: [0, 360],
-                              scale: [1, 1.1, 1]
-                            }}
-                            transition={{ 
-                              rotate: {
-                                duration: 10, 
-                                repeat: Infinity,
-                                ease: "linear"
-                              },
-                              scale: {
-                                duration: 3,
-                                repeat: Infinity,
-                                repeatType: "reverse"
-                              }
-                            }}
-                          >🌐</motion.div>
-                          <CardTitle>Solutions Avancées</CardTitle>
-                        </div>
-                        <CardDescription>
-                          Des fonctionnalités exclusives pour se démarquer
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Accédez à des fonctionnalités premium comme le résumé professionnel pour LinkedIn, le mini-site Link-in-bio pour Instagram et TikTok, et plus encore.
-                        </p>
-                        <motion.div 
-                          className="flex justify-end"
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          <Button asChild variant="default" className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                            <Link href="/pricing">
-                              Voir les forfaits
-                            </Link>
-                          </Button>
-                        </motion.div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </TabsContent>
-              </Tabs>
-            </motion.div>
-            
-            <motion.div 
-              className="mt-12 text-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.8 }}
-              variants={fadeIn}
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button asChild className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg">
-                  <Link href="/pricing">
-                    Voir tous les forfaits premium
-                  </Link>
-                </Button>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Generator Section */}
-        <section id="generator" className="py-16 bg-white dark:bg-gray-950 relative overflow-hidden">
-          {/* Decorative elements */}
-          <motion.div 
-            className="absolute top-0 left-0 w-64 h-64 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-70"
-            animate={{
-              scale: [1, 1.2, 1],
-              x: ["-50%", "-45%", "-50%"],
-              y: ["-50%", "-55%", "-50%"],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          ></motion.div>
-          <motion.div 
-            className="absolute bottom-0 right-0 w-96 h-96 bg-purple-100 dark:bg-purple-900/20 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl opacity-70"
-            animate={{
-              scale: [1, 1.3, 1],
-              x: ["33%", "30%", "33%"],
-              y: ["33%", "36%", "33%"],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          ></motion.div>
           
           <div className="container mx-auto px-4 relative z-10">
-            <motion.div 
-              className="max-w-xl mx-auto text-center mb-12"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.5 }}
-              variants={staggerContainer}
-            >
-              <motion.div variants={fadeIn}>
-                <Badge variant="outline" className="mb-4 px-3 py-1 text-sm border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300">
-                  Générateur de bio
+            <div className="max-w-3xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <Badge className="mb-5 px-3 py-1.5 text-sm bg-white/80 dark:bg-gray-900/80 text-indigo-600 dark:text-indigo-400 backdrop-blur-sm border-none">
+                  Intelligence artificielle pour votre présence en ligne
                 </Badge>
               </motion.div>
-              <motion.h2 
-                className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400"
-                variants={fadeIn}
+              
+              <motion.h1 
+                className="text-4xl md:text-6xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
               >
-                Créez votre bio parfaite maintenant
-              </motion.h2>
+                Des bios captivantes en quelques secondes
+              </motion.h1>
+              
               <motion.p 
-                className="text-slate-600 dark:text-slate-400 mb-0"
-                variants={fadeIn}
+                className="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Remplissez le formulaire ci-dessous pour obtenir une bio optimisée pour votre plateforme préférée.
+                Optimisez votre présence sur les réseaux sociaux avec des bios parfaitement adaptées à TikTok, Instagram, Twitter, LinkedIn et plus encore.
               </motion.p>
+              
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button asChild size="lg" className="rounded-full px-6 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg">
+                    <a href="#generator" className="flex items-center">
+                      Générer ma bio <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button asChild variant="outline" size="lg" className="rounded-full px-6 border-indigo-200 text-indigo-600 dark:border-indigo-800 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950">
+                    <Link href="/pricing">Version Premium</Link>
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Comment ça marche - Simple et clair */}
+        <section className="py-20 bg-white dark:bg-gray-950">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl font-bold mb-4">Comment ça fonctionne</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Un processus simple en trois étapes pour créer la bio parfaite
+              </p>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
+              {[
+                {
+                  icon: <Sparkles className="h-6 w-6" />,
+                  title: "Renseignez vos infos",
+                  description: "Indiquez votre nom, plateforme et centres d'intérêt pour personnaliser votre bio."
+                },
+                {
+                  icon: <Zap className="h-6 w-6" />,
+                  title: "Génération IA",
+                  description: "Notre intelligence artificielle crée une bio optimisée selon vos critères."
+                },
+                {
+                  icon: <Target className="h-6 w-6" />,
+                  title: "Résultats immédiats",
+                  description: "Obtenez instantanément votre bio et copiez-la directement sur vos profils."
+                }
+              ].map((step, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="flex flex-col items-center text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400">
+                    {step.icon}
+                  </div>
+                  <h3 className="text-xl font-medium mb-2">{step.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {step.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* Générateur - Section principale */}
+        <section id="generator" className="py-20 bg-gray-50 dark:bg-gray-900/50">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <Badge className="mb-4 px-3 py-1.5 text-sm bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border-none">
+                Générateur
+              </Badge>
+              <h2 className="text-3xl font-bold mb-4">Créez votre bio parfaite</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Complétez le formulaire ci-dessous pour générer une bio qui vous ressemble
+              </p>
             </motion.div>
             
             <motion.div
@@ -518,137 +256,173 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.7 }}
+              className="max-w-5xl mx-auto"
             >
-              <Card className="border-0 shadow-xl bg-white dark:bg-gray-900 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500"></div>
+              <Card className="border-0 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-gray-800">
                 <CardContent className="p-0">
-                  <BioGeneratorForm />
+                  <BioGeneratorForm prefilledValues={selectedExample}/>
                 </CardContent>
               </Card>
+              
+              {/* Suggestions d'exemples */}
+              <motion.div 
+                className="mt-8 flex flex-wrap gap-3 justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+              >
+                <p className="w-full text-center text-sm text-gray-500 dark:text-gray-400 mb-2">Ou essayez un exemple :</p>
+                {EXAMPLES.map((example) => (
+                  <motion.div 
+                    key={example.id}
+                    whileHover={{ scale: 1.03, boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }} 
+                    className="bg-white dark:bg-gray-800 rounded-full px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer transition-colors hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    onClick={() => handleExampleClick(example)}
+                  >
+                    {example.label}
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </section>
-
-        {/* Testimonials Section */}
-        <section className="py-16 bg-slate-50 dark:bg-slate-900">
+        
+        {/* Avantages - Simple et efficace */}
+        <section className="py-20 bg-white dark:bg-gray-950">
           <div className="container mx-auto px-4">
-            <motion.h2 
-              className="text-3xl font-bold text-center mb-12"
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
             >
-              Ce que disent nos utilisateurs
-            </motion.h2>
-            
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={staggerContainer}
-            >
-              <motion.div variants={fadeIn} whileHover={{ y: -10, transition: { type: "spring", stiffness: 400 } }}>
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center mb-4">
-                      <motion.div 
-                        className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-3"
-                        whileHover={{ scale: 1.2 }}
-                      >
-                        <span className="font-semibold text-indigo-700 dark:text-indigo-400">S</span>
-                      </motion.div>
-                      <div>
-                        <h4 className="font-semibold">Sophie M.</h4>
-                        <p className="text-sm text-gray-500">@sophie_mode</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      &ldquo;J&apos;ai gagné 500 followers sur Instagram en une semaine après avoir mis à jour ma bio avec HypeBio. Incroyable !&rdquo;
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div variants={fadeIn} whileHover={{ y: -10, transition: { type: "spring", stiffness: 400 } }}>
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center mb-4">
-                      <motion.div 
-                        className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center mr-3"
-                        whileHover={{ scale: 1.2 }}
-                      >
-                        <span className="font-semibold text-purple-700 dark:text-purple-400">T</span>
-                      </motion.div>
-                      <div>
-                        <h4 className="font-semibold">Thomas L.</h4>
-                        <p className="text-sm text-gray-500">@thomas_gaming</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      &ldquo;Ma bio TikTok générée par HypeBio a complètement transformé mon profil. Je reçois beaucoup plus d&apos;engagement !&rdquo;
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div variants={fadeIn} whileHover={{ y: -10, transition: { type: "spring", stiffness: 400 } }}>
-                <Card className="border-0 shadow-lg transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center mb-4">
-                      <motion.div 
-                        className="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/50 flex items-center justify-center mr-3"
-                        whileHover={{ scale: 1.2 }}
-                      >
-                        <span className="font-semibold text-pink-700 dark:text-pink-400">L</span>
-                      </motion.div>
-                      <div>
-                        <h4 className="font-semibold">Laura B.</h4>
-                        <p className="text-sm text-gray-500">@laura_business</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      &ldquo;HypeBio m&apos;a aidée à créer une bio LinkedIn professionnelle qui a attiré l&apos;attention de plusieurs recruteurs.&rdquo;
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
+              <h2 className="text-3xl font-bold mb-4">Pourquoi choisir HypeBio</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Des avantages conçus pour maximiser votre impact en ligne
+              </p>
             </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  emoji: "⚡️",
+                  title: "Rapide et efficace",
+                  description: "Créez une bio complète et optimisée en quelques secondes seulement.",
+                },
+                {
+                  emoji: "🎯",
+                  title: "Parfaitement adapté",
+                  description: "Chaque bio est conçue spécifiquement pour la plateforme que vous utilisez.",
+                },
+                {
+                  emoji: "🔍",
+                  title: "Optimisé pour l'engagement",
+                  description: "Des bios qui captent l'attention et génèrent plus d'interactions.",
+                },
+                {
+                  emoji: "🔄",
+                  title: "Générez à volonté",
+                  description: "Testez différentes variantes pour trouver celle qui vous convient le mieux.",
+                },
+                {
+                  emoji: "⭐️",
+                  title: "Résultats de qualité",
+                  description: "Des textes professionnels qui mettent en valeur votre personnalité.",
+                },
+                {
+                  emoji: "🌈",
+                  title: "Style personnalisé",
+                  description: "Choisissez parmi plusieurs styles pour refléter votre identité unique.",
+                }
+              ].map((advantage, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl"
+                >
+                  <div className="text-3xl mb-3">{advantage.emoji}</div>
+                  <h3 className="text-xl font-medium mb-2">{advantage.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{advantage.description}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
-
-        {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.5 }}
-              variants={staggerContainer}
-            >
+        
+        {/* Call to Action */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 z-0"></div>
+          
+          {/* Éléments décoratifs subtils */}
+          <div className="absolute w-full h-full">
+            <motion.div 
+              className="absolute top-1/4 right-1/4 w-80 h-80 rounded-full bg-white/5 blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                x: [0, 40, 0],
+              }}
+              transition={{
+                duration: 15,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
+            <motion.div 
+              className="absolute bottom-1/3 left-1/3 w-96 h-96 rounded-full bg-white/5 blur-3xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                y: [0, 40, 0],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
+          </div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl mx-auto text-center text-white">
               <motion.h2 
-                className="text-3xl font-bold mb-6"
-                variants={fadeIn}
+                className="text-3xl md:text-4xl font-bold mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6 }}
               >
-                Prêt à booster votre présence en ligne ?
+                Prêt à transformer votre présence en ligne ?
               </motion.h2>
+              
               <motion.p 
-                className="text-xl mb-8 max-w-2xl mx-auto"
-                variants={fadeIn}
+                className="text-xl mb-8 text-white/90"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
               >
-                Rejoignez des milliers d&apos;utilisateurs qui ont déjà transformé leurs profils avec HypeBio.
+                Rejoignez des milliers d'utilisateurs qui ont déjà boosté leur profil avec HypeBio
               </motion.p>
-              <motion.div 
-                variants={fadeIn}
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.97 }}
               >
-                <Button asChild size="lg" variant="secondary" className="bg-white text-indigo-600 hover:bg-white/90 shadow-lg hover:shadow-xl">
-                  <a href="#generator">Générer ma bio gratuitement</a>
+                <Button asChild size="lg" className="rounded-full px-8 py-6 bg-white hover:bg-white/90 text-indigo-600 font-medium shadow-lg hover:shadow-xl">
+                  <a href="#generator">
+                    Générer ma bio gratuitement
+                  </a>
                 </Button>
               </motion.div>
-            </motion.div>
+            </div>
           </div>
         </section>
       </main>
